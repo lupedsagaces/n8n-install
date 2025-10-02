@@ -1,50 +1,39 @@
 #!/bin/bash
-# Script de instalação e configuração do n8n via Docker
-# Autor: GoLab Offensive Security
-# Uso: ./install_n8n.sh
-
 set -e
 
-# Variáveis de configuração
-N8N_USER="admin"
-N8N_PASS="minha_senha_forte"   # altere aqui sua senha
-N8N_PORT=5678
-INSTALL_DIR="$HOME/n8n"
+# Diretório de instalação
+INSTALL_DIR=~/n8n
 
-echo -e "\n--- Atualizando sistema ---"
-sudo apt update && sudo apt upgrade -y
+echo "[+] Criando diretório do n8n em $INSTALL_DIR..."
+mkdir -p $INSTALL_DIR/n8n_data
+cd $INSTALL_DIR
 
-echo -e "\n--- Instalando Docker e Docker Compose ---"
-sudo apt install -y docker.io docker-compose
+echo "[+] Ajustando permissões..."
+sudo chown -R 1000:1000 n8n_data
 
-echo -e "\n--- Habilitando Docker ---"
-sudo systemctl enable docker --now
-
-echo -e "\n--- Criando diretório do n8n ---"
-mkdir -p $INSTALL_DIR && cd $INSTALL_DIR
-
-echo -e "\n--- Criando arquivo docker-compose.yml ---"
-cat > docker-compose.yml <<EOF
+echo "[+] Gerando docker-compose.yml..."
+cat > docker-compose.yml << 'EOF'
 version: "3"
 
 services:
   n8n:
-    image: n8nio/n8n
+    image: n8nio/n8n:latest
     restart: always
     ports:
-      - "${N8N_PORT}:5678"
+      - "5678:5678"
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_USER}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASS}
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=senhaforte123
+      - GENERIC_TIMEZONE=America/Sao_Paulo
     volumes:
       - ./n8n_data:/home/node/.n8n
 EOF
 
-echo -e "\n--- Subindo container do n8n ---"
+echo "[+] Subindo containers..."
+sudo docker-compose pull
 sudo docker-compose up -d
 
-echo -e "\n✅ Instalação concluída!"
-echo -e "Acesse seu n8n em: http://$(curl -s ifconfig.me):${N8N_PORT}"
-echo -e "Usuário: ${N8N_USER}"
-echo -e "Senha: ${N8N_PASS}"
+echo "[✓] n8n instalado e rodando em http://SEU_IP:5678"
+echo "Usuário: admin"
+echo "Senha: senhaforte123"
