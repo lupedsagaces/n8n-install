@@ -1,6 +1,8 @@
 # n8n-install
-Ferramenta para automatizar a instalação do n8n no linux
-Como usar:
+## Ferramenta para automatizar a instalação do n8n no linux
+
+### Como usar:
+
 Clonar o projeto:
 
 `git clone https://github.com/lupedsagaces/n8n-install.git`
